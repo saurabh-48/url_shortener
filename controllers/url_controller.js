@@ -1,6 +1,5 @@
 import shortid from 'shortid';
 import URL from '../models/url.js';
-import { Url } from 'url';
 
 class UrlController {
     async generateNewShortUrl(req, res){
@@ -12,10 +11,17 @@ class UrlController {
         await URL.create({
             shortId,
             redirectUrl: reqBody.url,
-            visitHistory: []
+            visitHistory: [],
+            createdBy: req.user._id
         });
 
         return res.json({ id: shortId })
+    }
+
+    async getAllUrls(req, res){
+        const result = await URL.find({});
+
+        return res.json(result);
     }
 
     async getUrlByShortId(req, res){
@@ -27,8 +33,14 @@ class UrlController {
                 visitHistory: { timestamps: new Date()}
             }
         });
+        return res.redirect(`https://${url.redirectUrl}`);
+    }
 
-        res.redirect(url.redirectUrl);
+    async getUserUrls(req, res){
+        const url = await URL.find({
+            createdBy: req.user._id
+        });
+        return res.json(url);
     }
 
     async getAnalytics(req, res){
