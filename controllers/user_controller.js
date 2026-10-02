@@ -1,5 +1,4 @@
 import User from "../models/user.js";
-import { v4 } from "uuid";
 import { setUser } from "../services/auth_service.js";
 
 class UserController{
@@ -26,14 +25,12 @@ class UserController{
         if(!user){
             return res.json({ msg: 'Invalid username or password' });
         }
-        const sessionId = v4();
         
-        setUser(sessionId, user);
-
-        res.cookie('uid', sessionId);
+        const token = setUser(user);
 
         return res.json({
-            msg: 'User logged in successfully'
+            msg: 'User logged in successfully',
+            token
         });
     }
 }
